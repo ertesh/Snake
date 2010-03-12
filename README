@@ -1,0 +1,4 @@
+A simple library: libgui
+Main goal of this library is to handle all SDL stuff that is needed to write a simple game, such as Snake.
+It is just for educational purposes only. I will show it for pre-high school students.
+I couldn't use OOP or any complex C++ because they don't know it yet.

@@ -47,10 +47,6 @@ void draw_background() {
     SDL_Flip(screen);
 }
 
-void draw(Funkcja f)
-{
-    return;
-}
 // Public interface
 
 void przygotuj(int width, int height)
@@ -103,11 +99,11 @@ void graj()
                 }
             }
             Uint8* keys = SDL_GetKeyState(NULL);
-            if (keys[SDLK_UP]) events[GORA];
-            if (keys[SDLK_DOWN]) events[DOL];
-            if (keys[SDLK_LEFT]) events[LEWO];
-            if (keys[SDLK_RIGHT]) events[PRAWO];
-            draw(events[RYSUJ]);
+            if (keys[SDLK_UP] && events[GORA] != NULL) events[GORA]();
+            if (keys[SDLK_DOWN] && events[DOL] != NULL) events[DOL]();
+            if (keys[SDLK_LEFT] && events[LEWO] != NULL) events[LEWO]();
+            if (keys[SDLK_RIGHT] && events[PRAWO] != NULL) events[PRAWO]();
+            if (events[RYSUJ] != NULL) events[RYSUJ]();
         }
     }
 }

@@ -24,6 +24,7 @@ enum Zdarzenie {
 // Wywołujemy tą funkcję, aby przypisać jednemu z powyższych zdarzeń
 // pewne zachowanie. Jako drugi parametr podajemy funkcję,
 // która zostanie wywołana po wystąpieniu zdarzenia.
+// Funkcja powinna być postaci: void* nazwa_funkcji()
 void ustaw_zdarzenie(Zdarzenie z, Funkcja);
 
 // Główna pętla programu, kończy się, gdy zamkniemy okno.
@@ -32,3 +33,4 @@ void graj();
 } // namespace
 
 #endif
+
