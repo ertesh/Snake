@@ -37,7 +37,7 @@ static void draw_image(SDL_Surface *img, int x, int y,
     SDL_BlitSurface(img, &dest2, screen, &dest);
 }
 
-void draw_background() {
+static void draw_background() {
     Image p = images[0];
     if (p.img == NULL) {
         printf("Brak tła\n");
@@ -48,7 +48,6 @@ void draw_background() {
 }
 
 // Public interface
-
 void przygotuj(int width, int height)
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
@@ -83,6 +82,22 @@ void ustaw_zdarzenie(Zdarzenie z, Funkcja f)
     events[z] = f;
 }
 
+void rysuj_obrazek(int numer, int x, int y)
+{
+    Image p = images[numer];
+    if (p.img == NULL) {
+        printf("Brak obrazka o numerze %d\n", numer);
+        return;
+    }
+    Image bg = images[0];
+    if (bg.img != NULL) {
+        draw_image(bg.img, x - 10, y - 10, p.width + 20, p.height + 20,
+                x - 10, y - 10);
+    }
+    draw_image(p.img, x, y);
+    SDL_Flip(screen);
+}
+
 void graj()
 {
     draw_background();
@@ -103,6 +118,8 @@ void graj()
             if (keys[SDLK_DOWN] && events[DOL] != NULL) events[DOL]();
             if (keys[SDLK_LEFT] && events[LEWO] != NULL) events[LEWO]();
             if (keys[SDLK_RIGHT] && events[PRAWO] != NULL) events[PRAWO]();
+
+            if (events[ZMIEN] != NULL) events[ZMIEN]();
             if (events[RYSUJ] != NULL) events[RYSUJ]();
         }
     }

@@ -18,7 +18,7 @@ bool wczytaj_obrazek(int numer, char* nazwa, int x, int y);
 
 // Zdarzenia, które możemy obsłużyć.
 enum Zdarzenie {
-    RYSUJ, PRAWO, LEWO, GORA, DOL
+    RYSUJ, ZMIEN, PRAWO, LEWO, GORA, DOL
 };
 
 // Wywołujemy tą funkcję, aby przypisać jednemu z powyższych zdarzeń
@@ -26,6 +26,10 @@ enum Zdarzenie {
 // która zostanie wywołana po wystąpieniu zdarzenia.
 // Funkcja powinna być postaci: void* nazwa_funkcji()
 void ustaw_zdarzenie(Zdarzenie z, Funkcja);
+
+// Rysuje obrazek wczytany pod podanym numerem.
+// Górny lewy róg obrazka ma współrzędne (x, y).
+void rysuj_obrazek(int numer, int x, int y);
 
 // Główna pętla programu, kończy się, gdy zamkniemy okno.
 void graj();
