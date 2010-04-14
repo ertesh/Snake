@@ -47,10 +47,24 @@ static void draw_background() {
     SDL_Flip(screen);
 }
 
+Uint32 timer_callback(Uint32 interval, void *param)
+{
+    SDL_Event event;
+    SDL_UserEvent userevent;
+    userevent.type = SDL_USEREVENT;
+    userevent.code = 0;
+    userevent.data1 = NULL;
+    userevent.data2 = NULL;
+    event.type = SDL_USEREVENT;
+    event.user = userevent;
+    SDL_PushEvent(&event);
+    return interval;
+}
+
 // Public interface
 void przygotuj(int width, int height)
 {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
         printf("Unable to init SDL: %s\n", SDL_GetError());
         exit(1);
     }
@@ -98,10 +112,11 @@ void rysuj_obrazek(int numer, int x, int y)
     SDL_Flip(screen);
 }
 
-void graj()
+void graj(int interval)
 {
     draw_background();
     bool done;
+    SDL_TimerID zegar = SDL_AddTimer(interval, timer_callback, NULL);
     while (!done) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -113,15 +128,18 @@ void graj()
                     done = true;
                 }
             }
+            if(event.type == SDL_USEREVENT)
+            {
+                if(event.user.code == 0)
+                    if (events[ZMIEN] != NULL) events[ZMIEN]();
+            }
             Uint8* keys = SDL_GetKeyState(NULL);
             if (keys[SDLK_UP] && events[GORA] != NULL) events[GORA]();
             if (keys[SDLK_DOWN] && events[DOL] != NULL) events[DOL]();
             if (keys[SDLK_LEFT] && events[LEWO] != NULL) events[LEWO]();
             if (keys[SDLK_RIGHT] && events[PRAWO] != NULL) events[PRAWO]();
-
-            if (events[ZMIEN] != NULL) events[ZMIEN]();
-            if (events[RYSUJ] != NULL) events[RYSUJ]();
         }
+        if (events[RYSUJ] != NULL) events[RYSUJ]();
     }
 }
 

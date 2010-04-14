@@ -32,7 +32,9 @@ void ustaw_zdarzenie(Zdarzenie z, Funkcja);
 void rysuj_obrazek(int numer, int x, int y);
 
 // Główna pętla programu, kończy się, gdy zamkniemy okno.
-void graj();
+// Jako parametr należy podać, czas w milisekundach,
+// po jakim zostaje wywołane zdarzenie ZMIEN
+void graj(int interval);
 
 } // namespace
 

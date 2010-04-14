@@ -9,3 +9,7 @@ program: main.cpp guilib.o
 
 guilib.o: guilib.cpp guilib.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS)
+
+clean:
+	rm *.o
+	rm program
