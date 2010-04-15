@@ -42,21 +42,21 @@ struct Plansza {
 struct Owoce {
     int ile_owocow;
     int limit_owocow;
-    void dodaj_owoc();
 };
 
 Snake wezyk;
 Plansza plansza;
 Owoce owoce;
+int wynik;
 
-void Owoce::dodaj_owoc() {
+void dodaj_owoc() {
     while (true) {
         int x = rand() % plansza.szerokosc;
         int y = rand() % plansza.wysokosc;
         if (plansza.mapa[x][y] == PLANSZA) {
             plansza.mapa[x][y] = OWOC;
             plansza.zmiana[x][y] = true;
-            ile_owocow++;
+            owoce.ile_owocow++;
             break;
         }
     }
@@ -135,19 +135,24 @@ void* zmien() {
             plansza.zmiana[p.x][p.y] = 1;
             wezyk.q.push(p);
             ++wezyk.len;
+            wynik += 10;
+            printf("%d\n", wynik);
             --owoce.ile_owocow;
             if (owoce.ile_owocow < owoce.limit_owocow) {
-                owoce.dodaj_owoc();
+                dodaj_owoc();
             }
             break;
         case WAZ:
             // Kolizja, koniec gry
-            return 0;
+            printf("Koniec gry\n");
+            printf("Wynik = %d\n", wynik);
+            return (void*) 1;
     }
     return 0;
 }
 
 int main() {
+    wynik = 0;
     wezyk.len = 3;
     wezyk.q.push(Punkt(0,0));
     wezyk.q.push(Punkt(1,0));
@@ -158,20 +163,20 @@ int main() {
     plansza.wysokosc = 24;
     owoce.ile_owocow = 0;
     owoce.limit_owocow = 3;
-    for (int i = 0; i < 3; ++i) owoce.dodaj_owoc();
+    for (int i = 0; i < 3; ++i) dodaj_owoc();
 
     int szer_ekranu = plansza.szerokosc * plansza.rozmiar;
     int wys_ekranu = plansza.wysokosc * plansza.rozmiar;
     przygotuj(szer_ekranu, wys_ekranu);
     wczytaj_obrazek(0, (char*)"bg.bmp", 640, 480);
-    wczytaj_obrazek(1, (char*)"4.bmp", plansza.rozmiar, plansza.rozmiar);
-    wczytaj_obrazek(2, (char*)"5.bmp", plansza.rozmiar, plansza.rozmiar);
+    wczytaj_obrazek(1, (char*)"snake.bmp", plansza.rozmiar, plansza.rozmiar);
+    wczytaj_obrazek(2, (char*)"apple.bmp", plansza.rozmiar, plansza.rozmiar);
     ustaw_zdarzenie(RYSUJ, rysuj);
     ustaw_zdarzenie(GORA, gora);
     ustaw_zdarzenie(DOL, dol);
     ustaw_zdarzenie(LEWO, lewo);
     ustaw_zdarzenie(PRAWO, prawo);
     ustaw_zdarzenie(ZMIEN, zmien);
-    graj(50);
+    graj(100);
 }
 

@@ -121,7 +121,7 @@ void graj(int interval)
 {
     draw_background();
     bool done;
-    SDL_TimerID zegar = SDL_AddTimer(interval, timer_callback, NULL);
+    SDL_AddTimer(interval, timer_callback, NULL);
     while (!done) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -136,7 +136,10 @@ void graj(int interval)
             if(event.type == SDL_USEREVENT)
             {
                 if(event.user.code == 0)
-                    if (events[ZMIEN] != NULL) events[ZMIEN]();
+                    if (events[ZMIEN] != NULL) {
+                        int ret = (int) events[ZMIEN]();
+                        if (ret != 0) done = true;
+                    }
             }
             Uint8* keys = SDL_GetKeyState(NULL);
             if (keys[SDLK_UP] && events[GORA] != NULL) events[GORA]();
