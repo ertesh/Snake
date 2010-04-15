@@ -23,18 +23,18 @@ static void draw_image(SDL_Surface *img, int x, int y)
     SDL_BlitSurface(img, NULL, screen, &dest);
 }
 
-static void draw_image(SDL_Surface *img, int x, int y,
-                                        int w, int h, int x2, int y2)
+static void draw_image(SDL_Surface *img, int dest_x, int dest_y,
+        int w, int h, int src_x, int src_y)
 {
     SDL_Rect dest;
-    dest.x = x;
-    dest.y = y;
-    SDL_Rect dest2;
-    dest2.x = x2;
-    dest2.y = y2;
-    dest2.w = w;
-    dest2.h = h;
-    SDL_BlitSurface(img, &dest2, screen, &dest);
+    dest.x = dest_x;
+    dest.y = dest_y;
+    SDL_Rect src;
+    src.w = w;
+    src.h = h;
+    src.x = src_x;
+    src.y = src_y;
+    SDL_BlitSurface(img, &src, screen, &dest);
 }
 
 static void draw_background() {
@@ -103,12 +103,17 @@ void rysuj_obrazek(int numer, int x, int y)
         printf("Brak obrazka o numerze %d\n", numer);
         return;
     }
-    Image bg = images[0];
-    if (bg.img != NULL) {
-        draw_image(bg.img, x - 10, y - 10, p.width + 20, p.height + 20,
-                x - 10, y - 10);
-    }
     draw_image(p.img, x, y);
+    SDL_Flip(screen);
+}
+
+void rysuj_tlo(int x, int y, int src_x, int src_y, int szer, int wys) {
+    Image p = images[0];
+    if (p.img == NULL) {
+        printf("Brak obrazka o numerze %d\n", 0);
+        return;
+    }
+    draw_image(p.img, x, y, szer, wys, src_x, src_y);
     SDL_Flip(screen);
 }
 

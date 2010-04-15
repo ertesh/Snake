@@ -31,6 +31,11 @@ void ustaw_zdarzenie(Zdarzenie z, Funkcja);
 // Górny lewy róg obrazka ma współrzędne (x, y).
 void rysuj_obrazek(int numer, int x, int y);
 
+// Rysuje wybrany fragment tła:
+// prostokąt (src_x, src_y) - (src_x + szer, src_y + wys)
+// i umieszcza go na ekranie jako prostokąt (x,y) - (x + szer, y + wys).
+void rysuj_tlo(int x, int y, int src_x, int src_y, int szer, int wys);
+
 // Główna pętla programu, kończy się, gdy zamkniemy okno.
 // Jako parametr należy podać, czas w milisekundach,
 // po jakim zostaje wywołane zdarzenie ZMIEN

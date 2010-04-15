@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstdlib>
 #include <queue>
 #include "guilib.h"
 
@@ -11,6 +12,10 @@ using namespace guilib;
 
 enum Kierunek {
     UP, DOWN, LEFT, RIGHT
+};
+
+enum Pole {
+    PLANSZA, WAZ, OWOC
 };
 
 struct Punkt {
@@ -31,19 +36,44 @@ struct Plansza {
     int szerokosc;
     int rozmiar;
     int mapa[MAX_WIDTH][MAX_HEIGHT];
+    bool zmiana[MAX_WIDTH][MAX_HEIGHT];
+};
+
+struct Owoce {
+    int ile_owocow;
+    int limit_owocow;
+    void dodaj_owoc();
 };
 
 Snake wezyk;
 Plansza plansza;
+Owoce owoce;
+
+void Owoce::dodaj_owoc() {
+    while (true) {
+        int x = rand() % plansza.szerokosc;
+        int y = rand() % plansza.wysokosc;
+        if (plansza.mapa[x][y] == PLANSZA) {
+            plansza.mapa[x][y] = OWOC;
+            plansza.zmiana[x][y] = true;
+            ile_owocow++;
+            break;
+        }
+    }
+}
 
 void* rysuj() {
-    rysuj_obrazek(0, 0, 0);
     for (int i = 0; i < plansza.szerokosc; ++i) {
         for (int j = 0; j < plansza.wysokosc; ++j) {
-            int x = plansza.rozmiar * i;
-            int y = plansza.rozmiar * j;
-            if (plansza.mapa[i][j] > 0)
-                rysuj_obrazek(plansza.mapa[i][j], x, y);
+            if (plansza.zmiana[i][j]) {
+                int x = plansza.rozmiar * i;
+                int y = plansza.rozmiar * j;
+                if (plansza.mapa[i][j] == 0)
+                    rysuj_tlo(x, y, x, y, plansza.rozmiar, plansza.rozmiar);
+                else
+                    rysuj_obrazek(plansza.mapa[i][j], x, y);
+                plansza.zmiana[i][j] = 0;
+            }
         }
     }
     return 0;
@@ -79,22 +109,41 @@ void* prawo() {
 
 void* zmien() {
     debug(printf("Zmien\n"));
-    Punkt p = wezyk.q.front();
-    wezyk.q.pop();
-    plansza.mapa[p.x][p.y] = 0;
-    p = wezyk.q.back();
+    // Przesuń głowę węża
+    Punkt p = wezyk.q.back();
     switch (wezyk.dir) {
         case UP: --p.y; break;
         case RIGHT: ++p.x; break;
         case DOWN: ++p.y; break;
         case LEFT: --p.x; break;
     }
-    p.y = (p.y + plansza.wysokosc) % plansza.wysokosc;
     p.x = (p.x + plansza.szerokosc) % plansza.szerokosc;
-    // TODO
-    debug(printf("%d %d\n", p.x, p.y));
-    plansza.mapa[p.x][p.y] = 1;
-    wezyk.q.push(p);
+    p.y = (p.y + plansza.wysokosc) % plansza.wysokosc;
+    switch(plansza.mapa[p.x][p.y]) {
+        case PLANSZA:
+            plansza.mapa[p.x][p.y] = WAZ;
+            plansza.zmiana[p.x][p.y] = 1;
+            wezyk.q.push(p);
+            // Usuń ogon węża
+            p = wezyk.q.front();
+            wezyk.q.pop();
+            plansza.mapa[p.x][p.y] = PLANSZA;
+            plansza.zmiana[p.x][p.y] = 1;
+            break;
+        case OWOC:
+            plansza.mapa[p.x][p.y] = WAZ;
+            plansza.zmiana[p.x][p.y] = 1;
+            wezyk.q.push(p);
+            ++wezyk.len;
+            --owoce.ile_owocow;
+            if (owoce.ile_owocow < owoce.limit_owocow) {
+                owoce.dodaj_owoc();
+            }
+            break;
+        case WAZ:
+            // Kolizja, koniec gry
+            return 0;
+    }
     return 0;
 }
 
@@ -107,14 +156,16 @@ int main() {
     plansza.rozmiar = 20;
     plansza.szerokosc = 32;
     plansza.wysokosc = 24;
+    owoce.ile_owocow = 0;
+    owoce.limit_owocow = 3;
+    for (int i = 0; i < 3; ++i) owoce.dodaj_owoc();
+
     int szer_ekranu = plansza.szerokosc * plansza.rozmiar;
     int wys_ekranu = plansza.wysokosc * plansza.rozmiar;
     przygotuj(szer_ekranu, wys_ekranu);
     wczytaj_obrazek(0, (char*)"bg.bmp", 640, 480);
-//    wczytaj_obrazek(1, (char*)"1.bmp", 300, 300);
-//    wczytaj_obrazek(2, (char*)"2.bmp", 300, 300);
-//    wczytaj_obrazek(3, (char*)"3.bmp", 300, 300);
     wczytaj_obrazek(1, (char*)"4.bmp", plansza.rozmiar, plansza.rozmiar);
+    wczytaj_obrazek(2, (char*)"5.bmp", plansza.rozmiar, plansza.rozmiar);
     ustaw_zdarzenie(RYSUJ, rysuj);
     ustaw_zdarzenie(GORA, gora);
     ustaw_zdarzenie(DOL, dol);
